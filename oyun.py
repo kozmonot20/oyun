@@ -134,7 +134,7 @@ class RuletSekmesi:
         self.label_durum = tk.Label(self.frame, text="Neon masada bahisler açık.", font=("Arial", 11, "italic"), bg="#050505", fg="#888888")
         self.label_durum.pack(pady=10)
 
-        self.btn_cevir = tk.Button(self.frame, text="⚡ CHIPS'LERİ SÜR VE DÖNDÜR", font=("Helvetica", 13, "bold"), bg="#00ff66", fg="#000000", activebackground="#00cc55", bd=0, cursor="hand2", padding=8, command=self.bahis_isleme)
+        self.btn_cevir = tk.Button(self.frame, text="⚡ CHIPS'LERİ SÜR VE DÖNDÜR", font=("Helvetica", 13, "bold"), bg="#00ff66", fg="#000000", activebackground="#00cc55", bd=0, cursor="hand2", command=self.bahis_isleme)
         self.btn_cevir.pack(pady=5)
         self.aktiflik_ayarla()
 
@@ -285,7 +285,7 @@ class SlotSekmesi:
         self.label_durum = tk.Label(self.frame, text="Makaraları Matrix akışına bırakın.", font=("Arial", 11, "italic"), bg="#050505", fg="#888888")
         self.label_durum.pack(pady=10)
 
-        self.btn_spin = tk.Button(self.frame, text="🚀 MATRIX STREAM'I BAŞLAT", font=("Helvetica", 13, "bold"), bg="gold", fg="black", activebackground="#cca300", bd=0, cursor="hand2", padding=8, command=self.bahis_kontrol)
+        self.btn_spin = tk.Button(self.frame, text="🚀 MATRIX STREAM'I BAŞLAT", font=("Helvetica", 13, "bold"), bg="gold", fg="black", activebackground="#cca300", bd=0, cursor="hand2", command=self.bahis_kontrol)
         self.btn_spin.pack(pady=10)
 
     def statik_matris_ciz(self, merkez_semboller):
