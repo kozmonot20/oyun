@@ -80,6 +80,7 @@ class RuletSekmesi:
         self.gecmis_sayilar = []
 
         self.renkler = {0: "green"}
+        # Eksik parantez hatası giderilmiş tam liste
         self.kirmizilar = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
         for i in range(1, 37):
             self.renkler[i] = "red" if i in self.kirmizilar else "black"
@@ -130,7 +131,6 @@ class RuletSekmesi:
         self.btn_cevir = tk.Button(self.frame, text="⚡ CHIPS'LERİ SÜR VE DÖNDÜR", font=("Helvetica", 13, "bold"), bg="#00ff66", fg="#000000", bd=0, cursor="hand2", command=self.bahis_isleme)
         self.btn_cevir.pack(pady=5)
         self.aktiflik_ayarla()
-
     def aktiflik_ayarla(self):
         if self.secilen_tur.get() == "Sayı":
             self.entry_sayi.config(state="normal")
@@ -188,7 +188,7 @@ class RuletSekmesi:
                 messagebox.showerror("Hata", "Sayı 0 ile 36 arasında olmalıdır!")
                 return
         self.ana.bakiye_senkronize_et(self.ana.kasa - miktar)
-        self.btn_cevir.config(state="disabled", bg="#222222")
+        self.btn_cevir.config(state="disabled")
         self.label_durum.config(text="Rien ne va plus! Top siber yörüngede...", fg="gold")
         self.animasyon_baslat(tür, hedef_sayi, miktar)
 
@@ -339,7 +339,6 @@ class BlackjackSekmesi:
         self.frame = frame
         self.ana = ana_casino
         
-        # Kart Destesi Altyapısı (Simgeler ve Sayısal Değerleri)
         self.seriler = ['♠', '♥', '♦', '♣']
         self.kart_tipleri = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
         
@@ -351,11 +350,9 @@ class BlackjackSekmesi:
         self.tasarla()
 
     def tasarla(self):
-        # Kasa Bakiye Göstergesi
         self.label_kasa = tk.Label(self.frame, text=f"BAKİYE: ${self.ana.kasa:,}", font=("Helvetica", 20, "bold"), bg="#050505", fg="#00ff66")
         self.label_kasa.pack(pady=15)
 
-        # Giriş/Bahis Alanı Paneli
         bahis_frame = tk.Frame(self.frame, bg="#050505")
         bahis_frame.pack(pady=10)
         
@@ -364,16 +361,12 @@ class BlackjackSekmesi:
         self.entry_bahis.grid(row=0, column=1, padx=10)
         self.entry_bahis.insert(0, "500")
 
-        # OYUN MASASI (Kasa ve Oyuncu Kart Alanları)
-        self.canvas_masa = tk.Canvas(self.frame, width=550, height=280, bg="#111111", highlightthickness=1, highlightbackground="#00ff66")
-        self.canvas_slot = self.canvas_masa # Geriye dönük uyumluluk bağı için
-        self.canvas_masa.pack(pady=15)
+        self.canvas_text_area = tk.Canvas(self.frame, width=550, height=280, bg="#111111", highlightthickness=1, highlightbackground="#00ff66")
+        self.canvas_text_area.pack(pady=15)
 
-        # Durum ve Bilgi Ekranı
         self.label_durum = tk.Label(self.frame, text="Bahsinizi koyun ve Krupiyeye karşı meydan okuyun!", font=("Arial", 11, "italic"), bg="#050505", fg="#888888")
         self.label_durum.pack(pady=10)
 
-        # AKSİYON BUTONLARI PANELİ
         buton_frame = tk.Frame(self.frame, bg="#050505")
         buton_frame.pack(pady=10)
 
@@ -395,9 +388,8 @@ class BlackjackSekmesi:
     def el_skoru_hesapla(self, el):
         skor = 0
         as_sayisi = 0
-        
         for kart in el:
-            tip = kart[0] # Kartın tipi ('A', 'K', '10' vs.)
+            tip = kart[0] # Tuple'ın ilk elemanı kart tipidir (Hata burası düzeltilerek çözüldü)
             if tip in ['J', 'Q', 'K']:
                 skor += 10
             elif tip == 'A':
@@ -405,54 +397,47 @@ class BlackjackSekmesi:
                 skor += 11
             else:
                 skor += int(tip)
-                
-        # Eğer 21'i geçtiysek ve elimizde As varsa As'ları 1 saydırıyoruz
         while skor > 21 and as_sayisi > 0:
             skor -= 10
             as_sayisi -= 1
-            
         return skor
-
     def ekran_temizle(self):
-        self.canvas_masa.delete("all")
-        # Masaya şık siber yazılar ekleyelim
-        self.canvas_masa.create_text(275, 40, text="KRUPİYE (KASA)", fill="#555555", font=("Helvetica", 12, "bold"))
-        self.canvas_masa.create_text(275, 170, text="OYUNCU (SİZ)", fill="#555555", font=("Helvetica", 12, "bold"))
+        self.canvas_text_area.delete("all")
+        self.canvas_text_area.create_text(275, 40, text="KRUPİYE (KASA)", fill="#555555", font=("Helvetica", 12, "bold"))
+        self.canvas_text_area.create_text(275, 170, text="OYUNCU (SİZ)", fill="#555555", font=("Helvetica", 12, "bold"))
 
     def ekranlari_guncelle(self, kasa_gizli=True):
         self.ekran_temizle()
         
-        # 1. Kasa Kartlarını Çiz
+        # 1. Kasa Kartlarını Siber Arayüze Çiz
         for idx, kart in enumerate(self.kasa_eli):
             cx = 50 + (idx * 75)
             cy = 70
             if kasa_gizli and idx == 1:
-                # Gizli Kartın Arka Yüzü (Neon Çizgili)
-                self.canvas_masa.create_rectangle(cx, cy, cx+60, cy+85, fill="#222222", outline="gold", width=2)
-                self.canvas_masa.create_text(cx+30, cy+42, text="?", fill="gold", font=("Arial", 24, "bold"))
+                self.canvas_text_area.create_rectangle(cx, cy, cx+60, cy+85, fill="#222222", outline="gold", width=2)
+                self.canvas_text_area.create_text(cx+30, cy+42, text="?", fill="gold", font=("Arial", 24, "bold"))
             else:
-                # Açık Kart Tasarımı
-                self.canvas_masa.create_rectangle(cx, cy, cx+60, cy+85, fill="white", outline="#00ff66", width=1)
+                self.canvas_text_area.create_rectangle(cx, cy, cx+60, cy+85, fill="white", outline="#00ff66", width=1)
                 renk = "red" if kart[1] in ['♥', '♦'] else "black"
-                self.canvas_masa.create_text(cx+15, cy+15, text=kart[0], fill=renk, font=("Arial", 12, "bold"))
-                self.canvas_masa.create_text(cx+30, cy+45, text=kart[1], fill=renk, font=("Arial", 28))
+                self.canvas_text_area.create_text(cx+15, cy+15, text=kart[0], fill=renk, font=("Arial", 12, "bold"))
+                self.canvas_text_area.create_text(cx+30, cy+45, text=kart[1], fill=renk, font=("Arial", 28))
 
-        # 2. Oyuncu Kartlarını Çiz
+        # 2. Oyuncu Kartlarını Siber Arayüze Çiz
         for idx, kart in enumerate(self.oyuncu_eli):
             cx = 50 + (idx * 75)
             cy = 185
-            self.canvas_masa.create_rectangle(cx, cy, cx+60, cy+85, fill="white", outline="#00ff66", width=1)
+            self.canvas_text_area.create_rectangle(cx, cy, cx+60, cy+85, fill="white", outline="#00ff66", width=1)
             renk = "red" if kart[1] in ['♥', '♦'] else "black"
-            self.canvas_masa.create_text(cx+15, cy+15, text=kart[0], fill=renk, font=("Arial", 12, "bold"))
-            self.canvas_masa.create_text(cx+30, cy+45, text=kart[1], fill=renk, font=("Arial", 28))
+            self.canvas_text_area.create_text(cx+15, cy+15, text=kart[0], fill=renk, font=("Arial", 12, "bold"))
+            self.canvas_text_area.create_text(cx+30, cy+45, text=kart[1], fill=renk, font=("Arial", 28))
 
-        # Skor Yazılarını Ekrana Bas
+        # Canlı Skor Bilgilerini Ekrana Yazdır
         o_skor = self.el_skoru_hesapla(self.oyuncu_eli)
-        self.canvas_masa.create_text(480, 225, text=f"Skor: {o_skor}", fill="#00ff66", font=("Arial", 14, "bold"))
+        self.canvas_text_area.create_text(480, 225, text=f"Skor: {o_skor}", fill="#00ff66", font=("Arial", 14, "bold"))
         
         if not kasa_gizli:
             k_skor = self.el_skoru_hesapla(self.kasa_eli)
-            self.canvas_masa.create_text(480, 110, text=f"Skor: {k_skor}", fill="gold", font=("Arial", 14, "bold"))
+            self.canvas_text_area.create_text(480, 110, text=f"Skor: {k_skor}", fill="gold", font=("Arial", 14, "bold"))
 
     def oyun_baslat(self):
         try:
@@ -462,10 +447,9 @@ class BlackjackSekmesi:
             return
             
         if self.aktif_bahis <= 0 or self.aktif_bahis > self.ana.kasa:
-            messagebox.showerror("Hata", "Yetersiz bakiye veya geçersiz bahis!")
+            messagebox.showerror("Hata", "Yetersiz bakiye!")
             return
 
-        # Bahsi kasadan düş
         self.ana.bakiye_senkronize_et(self.ana.kasa - self.aktif_bahis)
         
         self.deste_hazirla()
@@ -479,7 +463,6 @@ class BlackjackSekmesi:
         self.btn_hit.config(state="normal")
         self.btn_stand.config(state="normal")
         
-        # Doğal Blackjack Kontrolü (İlk iki kartta 21 gelmesi)
         if self.el_skoru_hesapla(self.oyuncu_eli) == 21:
             self.dur()
 
@@ -488,7 +471,6 @@ class BlackjackSekmesi:
         CasinoSesMotoru.tik_sesi()
         self.ekranlari_guncelle(kasa_gizli=True)
         
-        # 21'i geçme kontrolü (Bust)
         if self.el_skoru_hesapla(self.oyuncu_eli) > 21:
             self.dur()
 
@@ -498,7 +480,7 @@ class BlackjackSekmesi:
         
         oyuncu_skor = self.el_skoru_hesapla(self.oyuncu_eli)
         
-        # Oyuncu batmadıysa kasa 17'ye ulaşana kadar kart çeker
+        # Oyuncu yanmadıysa (Bust değilse) yapay zeka krupiye 17'ye ulaşana kadar kart çeker
         if oyuncu_skor <= 21:
             while self.el_skoru_hesapla(self.kasa_eli) < 17:
                 self.kasa_eli.append(self.deste.pop())
@@ -512,21 +494,17 @@ class BlackjackSekmesi:
         k_skor = self.el_skoru_hesapla(self.kasa_eli)
         bahis = self.aktif_bahis
         
-        # 1. Senaryo: Oyuncu 21'i geçti (Bust)
         if o_skor > 21:
             CasinoSesMotoru.kayıp_sesi()
             self.label_durum.config(text=f"Bust! 21'i geçtiniz. Kasa kazandı (-${bahis:,})", fg="#ff3333")
             self.ana.bakiye_senkronize_et(self.ana.kasa)
-        # 2. Senaryo: Kasa 21'i geçti (Kasa Bust)
         elif k_skor > 21:
             CasinoSesMotoru.kazanc_sesi()
             kazanc = bahis * 2
             self.ana.bakiye_senkronize_et(self.ana.kasa + kazanc)
             self.label_durum.config(text=f"Krupiye battı! Kazandınız (+${bahis:,})", fg="#00ff66")
-        # 3. Senaryo: Oyuncu skoru kasanın skorundan yüksek
         elif o_skor > k_skor:
             CasinoSesMotoru.kazanc_sesi()
-            # Doğal Blackjack (2 kartla 21) ise 3:2 ödeme yapar
             if o_skor == 21 and len(self.oyuncu_eli) == 2:
                 kazanc = int(bahis * 2.5)
                 self.label_durum.config(text=f"🃏 BLACKJACK! Muazzam Kazanç (+${int(bahis*1.5):,})", fg="#00ff66")
@@ -534,12 +512,10 @@ class BlackjackSekmesi:
                 kazanc = bahis * 2
                 self.label_durum.config(text=f"Krupiyeyi yendiniz! Kazandınız (+${bahis:,})", fg="#00ff66")
             self.ana.bakiye_senkronize_et(self.ana.kasa + kazanc)
-        # 4. Senaryo: Kasa skoru oyuncudan yüksek
         elif k_skor > o_skor:
             CasinoSesMotoru.kayıp_sesi()
             self.label_durum.config(text=f"Krupiye daha yüksek el yaptı. Kaybettiniz (-${bahis:,})", fg="#ff3333")
             self.ana.bakiye_senkronize_et(self.ana.kasa)
-        # 5. Senaryo: Beraberlik (Push)
         else:
             self.ana.bakiye_senkronize_et(self.ana.kasa + bahis)
             self.label_durum.config(text="Push! Berabere, bahis iade edildi.", fg="cyan")
