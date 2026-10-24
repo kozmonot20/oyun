@@ -236,7 +236,7 @@ class RuletSekmesi:
             CasinoSesMotoru.kayıp_sesi()
             self.label_durum.config(text=f"Kasa Aldı! Sonuç: {nihai_sayi} ({renk_isimi})", fg="#ff3333")
             self.ana.bakiye_senkronize_et(self.ana.kasa)
-        self.btn_cevir.config(state="normal", bg="#00ff66")
+        self.btn_cevir.config(state="normal")
 class SlotSekmesi:
     def __init__(self, frame, ana_casino):
         self.frame = frame
